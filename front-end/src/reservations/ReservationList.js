@@ -38,7 +38,11 @@ function ReservationList({ reservations }) {
             </div>
         )
     }
-    else return "No reservations for this date yet!";
-}
+    else return (
+        <div className="px=2">
+            No reservations for this date yet!
+        </div>
+    )
+            }
 
 export default ReservationList;

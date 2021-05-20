@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { listByDate } from "../utils/api";
+import { today, previous, next } from "../utils/date-time";
 import ReservationList from "../reservations/ReservationList";
 import useQuery from "../utils/useQuery";
 import ErrorAlert from "../layout/ErrorAlert";
@@ -13,8 +14,10 @@ import ErrorAlert from "../layout/ErrorAlert";
  */
 function Dashboard({ date }) {
   const query = useQuery();
-  console.log(query.get("date"));
-    date = query.get("date");
+  if (query.get("date")) {
+    date = query.get("date")
+  }
+  console.log("date", date)
   
 
   /*const params = useParams();
@@ -27,8 +30,6 @@ function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
 
-  useEffect(loadDashboard, [date]);
-
   function loadDashboard() {
     const res_date = date;
     const abortController = new AbortController();
@@ -36,8 +37,11 @@ function Dashboard({ date }) {
     listByDate(res_date, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
+    console.log("reservations", reservations)
     return () => abortController.abort();
   }
+
+   useEffect(loadDashboard, [date, reservations]);
 
   return (
     <main>
@@ -45,7 +49,20 @@ function Dashboard({ date }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for {date}</h4>
       </div>
-      <div>
+      <div className="row">
+        <Link to={`/dashboard/?date=${previous(date)}`} className="btn btn-dark">
+          Yesterday
+        </Link>
+        &nbsp;
+        <Link to={`/dashboard`} className="btn btn-light">
+          Today
+        </Link>
+        &nbsp;
+        <Link to={`/dashboard/?date=${next(date)}`} className="btn btn-dark">
+          Tomorrow
+        </Link>
+      </div>
+      <div className="row">
         <ReservationList reservations={reservations} />
       </div>
       <ErrorAlert error={reservationsError} />

@@ -69,7 +69,7 @@ export async function listReservations(params, signal) {
 }
 
 export async function listByDate(reservation_date, signal) {
-  const url = `${API_BASE_URL}/?date=${reservation_date}`;
+  const url = `${API_BASE_URL}/reservations/?date=${reservation_date}`;
   return await fetchJson(url, { signal })
     .then(formatReservationDate)
     .then(formatReservationTime);
@@ -77,7 +77,7 @@ export async function listByDate(reservation_date, signal) {
 
 
 export async function createReservation(reservation, signal) {
-  const url = new URL(`${API_BASE_URL}/reservations/new`);
+  const url = `${API_BASE_URL}/reservations/`;
   const options = {
     method: "POST",
     headers,

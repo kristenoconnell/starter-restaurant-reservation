@@ -16,7 +16,7 @@ import { today } from "../utils/date-time";
 function Routes() {
   return (
     <Switch>
-      <Route path="/dashboard">
+      <Route path="/dashboard/">
         <Dashboard date={today()} />
       </Route>
       <Route path="/reservations/new">
@@ -40,4 +40,8 @@ export default Routes;
 
  /*<Route path="/dashboard/?date=/:date">
    <Dashboard />
- </Route>;*/
+ </Route>;
+ 
+  <Route path="/dashboard">
+        <Dashboard />
+      </Route>*/
