@@ -77,7 +77,7 @@ export async function listByDate(reservation_date, signal) {
 
 
 export async function createReservation(reservation, signal) {
-  const url = `${API_BASE_URL}/reservations/`;
+  const url = `${API_BASE_URL}/reservations`;
   const options = {
     method: "POST",
     headers,

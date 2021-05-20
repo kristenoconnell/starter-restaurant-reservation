@@ -2,7 +2,7 @@ import React from 'react';
 
 function ReservationForm({ formData, handleChange, handleSubmit }) {
     return (
-        <div>
+        <form onSubmit={handleSubmit}>
             <label htmlFor="first_name">
                 First Name: 
                 <input
@@ -79,7 +79,7 @@ function ReservationForm({ formData, handleChange, handleSubmit }) {
                     required
                 />
             </label>
-        </div>
+        </form>
     )
 }
 

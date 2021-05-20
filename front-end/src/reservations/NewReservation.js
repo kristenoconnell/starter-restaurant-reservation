@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
-import useQuery from "../utils/useQuery";
+//import useQuery from "../utils/useQuery";
 
 import ReservationForm from "./ReservationForm";
 
@@ -22,43 +22,45 @@ function NewReservation() {
     //const date = query.get("date");
 
     const handleChange = ({ target }) => {
-        let value = target.value;
+        //let value = target.value;
         setFormData({
             ...formData,
-            [target.name]: value
+            [target.name]: target.value
         });
     }
 
-    const handleSubmit = (event) => {
+      const handleSubmit = (event) => {
         event.preventDefault();
-        const abortController = new AbortController();
-        async function newReservation() {
-            try {
-                await createReservation(formData, abortController.signal);
-                history.push("/dashboard");
-                //history.push(`/dashboard/?date=${date}`);
-            } catch (error) {
-                throw error;
-            }
 
+        async function newReservation() {
+          try {
+            const newRes = await createReservation(formData);
+            history.push(`/dashboard/?date=${newRes.reservation_date}`);
+          } catch (error) {
+            if (error === !"AbortError") {
+              throw error;
+            }
+          }
         }
         newReservation();
-        return () => abortController.abort;
-    };
+      };
 
     return (
-        <div class="container mx-auto" style={{width: 400}}>
-            <h1>New Reservation</h1>
-            <form onSubmit={handleSubmit}>
-                <ReservationForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
-                <br />
-                <br />
-                <button onClick={() => history.goBack()}>Cancel</button>
-                <button type="submit">Submit</button>
-            </form>
-
+      <div class="container mx-auto" style={{ width: 400 }}>
+        <h1>New Reservation</h1>
+        <div>
+          <ReservationForm
+            formData={formData}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+          />
+          <br />
+          <br />
+          <button onClick={() => history.goBack()}>Cancel</button>
+          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
         </div>
-    )
+      </div>
+    );
 }
 
 export default NewReservation;
