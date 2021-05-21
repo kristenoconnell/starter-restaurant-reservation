@@ -18,47 +18,37 @@ function NewReservation() {
 
     const [formData, setFormData] = useState({ ...initialFormState});
     const history = useHistory();
-    //const query = useQuery();
-    //const date = query.get("date");
 
     const handleChange = ({ target }) => {
         //let value = target.value;
+        console.log("form", formData);
         setFormData({
             ...formData,
             [target.name]: target.value
         });
     }
 
-      const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-
-        async function newReservation() {
-          try {
+        console.log("event", event)
+        try {
             const newRes = await createReservation(formData);
             history.push(`/dashboard/?date=${newRes.reservation_date}`);
-          } catch (error) {
+        } catch (error) {
             if (error === !"AbortError") {
-              throw error;
+                throw error;
             }
-          }
         }
-        newReservation();
-      };
+    };
 
     return (
       <div class="container mx-auto" style={{ width: 400 }}>
-        <h1>New Reservation</h1>
-        <div>
-          <ReservationForm
-            formData={formData}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-          />
-          <br />
-          <br />
-          <button onClick={() => history.goBack()}>Cancel</button>
-          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
-        </div>
+            <h1>New Reservation</h1>
+            <div>
+                <ReservationForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
+                <br />
+                <br />
+            </div>
       </div>
     );
 }

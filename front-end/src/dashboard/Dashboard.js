@@ -12,20 +12,12 @@ import ErrorAlert from "../layout/ErrorAlert";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function Dashboard({ date, setDate }) {
   const query = useQuery();
   if (query.get("date")) {
     date = query.get("date")
   }
   console.log("date", date)
-  
-
-  /*const params = useParams();
-  if (params.date) {
-    date = params.date;
-    console.log("date", date);
-    console.log("params", params);
-  } */
 
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
@@ -51,7 +43,7 @@ function Dashboard({ date }) {
       </div>
       <div className="row">
         <Link to={`/dashboard/?date=${previous(date)}`} className="btn btn-dark">
-          Yesterday
+          Previous
         </Link>
         &nbsp;
         <Link to={`/dashboard`} className="btn btn-light">
@@ -59,7 +51,7 @@ function Dashboard({ date }) {
         </Link>
         &nbsp;
         <Link to={`/dashboard/?date=${next(date)}`} className="btn btn-dark">
-          Tomorrow
+          Next
         </Link>
       </div>
       <div className="row">

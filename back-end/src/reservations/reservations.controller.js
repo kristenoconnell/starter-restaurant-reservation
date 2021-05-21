@@ -2,6 +2,8 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const validator = require("validator");
 const service = require("./reservations.service");
 
+//-->MIDDLEWARE<--
+
 //validation middleware
 const VALID_PROPERTIES = [
   "first_name",
@@ -47,6 +49,7 @@ function hasValidProperties(req, res, next) {
   } next();
 }
 
+//validate people field is a number
 function validPeople(req, res, next) {
   const { data = { people } } = req.body;
   if (typeof(data.people) !== "number") {
@@ -81,6 +84,44 @@ function validTime(req, res, next) {
   } next();
 }
 
+//No reservations on Tuesdays
+function notTuesday(req, res, next) {
+  const { data = { reservation_date } } = req.body;
+  const day = new Date(data.reservation_date).getUTCDay();
+  if (day === 2) {
+    return next({
+      status: 400,
+      message: "This restaurant is closed on Tuesdays. Please choose a different day."
+    })
+  } next();
+}
+
+//No reservations in the past
+function isInFuture(req, res, next) {
+  const { data = { reservation_date, reservation_time } } = req.body;
+  const thisDate = Date.now();
+  const resDate = new Date(`${data.reservation_date} ${data.reservation_time}`).valueOf();
+
+  if (thisDate > resDate) {
+    return next({
+      status: 400,
+      message: "Please select a future date and time."
+    })
+  } next();
+}
+
+//No reservations outside of business hours
+function withinBusinessHours(req, res, next) {
+  const { data = { reservation_time } } = req.body;
+  const time = data.reservation_time;
+  if (time < "10:30" || time > "21:30") {
+    return next({
+      status: 400,
+      message: "Reservations must be made between 10:30 AM and 9:30 PM."
+    })
+  } next();
+}
+
 /**
  * List handler for reservation resources
  */
@@ -91,7 +132,7 @@ async function listByDate(req, res) {
   res.json({ data });
 }
 
-
+//Create handler
 async function create(req, res) {
   const newRes = await service.create(req.body.data);
 
@@ -101,5 +142,5 @@ async function create(req, res) {
 module.exports = {
   //listByDate: asyncErrorBoundary(listByDate);
   listByDate: asyncErrorBoundary(listByDate),
-  create: [hasValidProperties, validDate, validTime, validPeople, asyncErrorBoundary(create)]
+  create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, asyncErrorBoundary(create)]
 };
