@@ -1,44 +1,59 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useHistory } from "react-router-dom";
+import { table } from "../../../back-end/src/db/connection";
+import { listTables } from "../utils/api";
+import SelectTable from "./SelectTable";
 
-function SeatTable({ tables }) {
+function SeatTable() {
+
+    const [tables, setTables] = useState([]);
+    const [tableErrors, setTableErrors] = useState(null);
+    const [reservation, setReservation] = useState(null);
+    const [formData, setFormData] = useState({});
+    const { reservationId } = useParams();
+    const abortController = new AbortController();
+    const history = useHistory();
 
     function loadTables() {
-        
+        listTables(abortController.signal)
+            .then(setTables)
+            .then(() => readReservation(reservationId))
+            .then(setReservation)
+            .catch((tableErrors) => setTableErrors);
+        return () => abortController.abort(); 
     }
 
-    const history = useHistory();
+    useEffect(loadTables, [reservation])
 
     //define change handler
     const handleChange = async ({ target }) => {
-        [target.name] = target.value;
-    }
+        setFormData = {
+            ...formData,
+            [target.name]: target.value
+        }
+    };
 
     //define submit handler
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log(event);
+        //option.table.reservation_id = reservationId;
+        //table.status=
+
+        //on submit
+        //const table.reservation_id = reservationId;
+        //table.status = "Occupied";
+        //return to dashboard; 
 
     }
 
     //define initial form state??
 
-    const selectTable = () => {
-        <select id="table_id" name="table_id" onChange={handleChange}>
-            <option value="">Select a Table</option>
-            {tables.map((table) => (
-                <option value={table.table_name}>{table.table_name} - {table.capacity}</option>
-            ))}
-        </select>
-    }
     return (
         <div className="container">
             <div className="row">
-                {selectTable}
-            </div>
-            <div className="row">
-                <button type="submit" onClick={handleSubmit}>Save</button>
-                <button onClick={() => history.goBack()}>Cancel</button>
-            </div>
+                <SelectTable tables={tables} reservation={reservation} handleChange={handleChange} handleSubmit={handleSubmit} />
+            </div> 
         </div>
     )
 }
