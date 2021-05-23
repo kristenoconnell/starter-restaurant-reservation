@@ -71,7 +71,7 @@ function ReservationForm({ formData, handleChange, handleSubmit }) {
         </label>
         <br />
         <label htmlFor="people">
-          People in Party:
+          Party Size:
           <input
             type="number"
             name="people"
@@ -84,7 +84,7 @@ function ReservationForm({ formData, handleChange, handleSubmit }) {
         </label>
         <br />
         <button onClick={() => history.goBack()}>Cancel</button>
-        <button type="submit">Submit</button>
+        <button type="submit" onClick={(event) => handleSubmit(event)}>Submit</button>
       </form>
     );
 }

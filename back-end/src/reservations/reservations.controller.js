@@ -20,7 +20,7 @@ const VALID_PROPERTIES = [
 //clunky middleware to check for missing or empty properties
 function hasValidProperties(req, res, next) {
   const { data = {} } = req.body;
-  console.log("data", data);
+  //console.log("data", data);
   const invalid = [];
   if (!data.first_name || data.first_name === "") {
     invalid.push("first_name");
@@ -128,19 +128,17 @@ function withinBusinessHours(req, res, next) {
 async function listByDate(req, res) {
   const date = req.query.date;
   const data = await service.listByDate(date);
-  console.log("Data", data);
+  //console.log("Data", data);
   res.json({ data });
 }
 
 //Create handler
 async function create(req, res) {
   const newRes = await service.create(req.body.data);
-
   res.status(201).json({ data: newRes });
 }
 
 module.exports = {
-  //listByDate: asyncErrorBoundary(listByDate);
   listByDate: asyncErrorBoundary(listByDate),
   create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, asyncErrorBoundary(create)]
 };

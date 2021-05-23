@@ -4,6 +4,8 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
 import NewReservation from "../reservations/NewReservation";
+import NewTable from "../tables/NewTable";
+import SeatTable from "../tables/SeatTable";
 import { today } from "../utils/date-time";
 import useQuery from "../utils/useQuery";
 
@@ -16,20 +18,13 @@ import useQuery from "../utils/useQuery";
  */
 function Routes() {
 
-  /*const [date, setDate] = useState(today());
-
-  const query = useQuery();
-  function getDate() {
-    const queryDate = query.get("date");
-    if (queryDate) {
-      setDate(queryDate);
-    }
-  }*/
-
   return (
     <Switch>
+      <Route exact={true} path="/">
+        <Redirect to={"/dashboard"} />
+      </Route>
       <Route path="/dashboard">
-        <Dashboard date={today()}  />
+        <Dashboard date={today()} />
       </Route>
       <Route path="/reservations/new">
         <NewReservation />
@@ -37,7 +32,13 @@ function Routes() {
       <Route exact={true} path="/reservations">
         <Redirect to={"/dashboard"} />
       </Route>
-      <Route exact={true} path="/">
+      <Route path="/reservations/:reservation_id/seat">
+        <SeatTable />
+      </Route>
+      <Route path="/tables/new">
+        <NewTable />
+      </Route>
+      <Route path="/tables">
         <Redirect to={"/dashboard"} />
       </Route>
       <Route>

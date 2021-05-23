@@ -13,7 +13,7 @@ function NewReservation() {
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
-        people: ""
+        people: 1
     };
 
     const [formData, setFormData] = useState({ ...initialFormState});
@@ -22,6 +22,7 @@ function NewReservation() {
     const handleChange = ({ target }) => {
         //let value = target.value;
         console.log("form", formData);
+
         setFormData({
             ...formData,
             [target.name]: target.value
@@ -33,7 +34,7 @@ function NewReservation() {
         console.log("event", event)
         try {
             const newRes = await createReservation(formData);
-            history.push(`/dashboard/?date=${newRes.reservation_date}`);
+            history.push(`/dashboard/?date=${newRes.reservation_date.slice(0,10)}`);
         } catch (error) {
             if (error === !"AbortError") {
                 throw error;
@@ -42,7 +43,7 @@ function NewReservation() {
     };
 
     return (
-      <div class="container mx-auto" style={{ width: 400 }}>
+      <div className="container mx-auto" style={{ width: 400 }}>
             <h1>New Reservation</h1>
             <div>
                 <ReservationForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />

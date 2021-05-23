@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { listByDate } from "../utils/api";
+import { listByDate, listTables } from "../utils/api";
 import { today, previous, next } from "../utils/date-time";
 import ReservationList from "../reservations/ReservationList";
+import TablesList from "../tables/TablesList";
 import useQuery from "../utils/useQuery";
 import ErrorAlert from "../layout/ErrorAlert";
 
@@ -17,10 +18,12 @@ function Dashboard({ date, setDate }) {
   if (query.get("date")) {
     date = query.get("date")
   }
-  console.log("date", date)
+  //console.log("date", date)
 
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+  const [tables, setTables] = useState([]);
+  const [tablesError, setTablesError] = useState(null);
 
   function loadDashboard() {
     const res_date = date;
@@ -29,11 +32,17 @@ function Dashboard({ date, setDate }) {
     listByDate(res_date, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
-    console.log("reservations", reservations)
+    setTablesError(null);
+    listTables(abortController.signal)
+      .then(setTables)
+      .catch(setTablesError);
+    
+    //console.log("reservations", reservations)
+    console.log("tables", tables)
     return () => abortController.abort();
   }
 
-   useEffect(loadDashboard, [date, reservations]);
+   useEffect(loadDashboard, [date]);
 
   return (
     <main>
@@ -41,7 +50,7 @@ function Dashboard({ date, setDate }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for {date}</h4>
       </div>
-      <div className="row">
+      <div className="row mx-2">
         <Link to={`/dashboard/?date=${previous(date)}`} className="btn btn-dark">
           Previous
         </Link>
@@ -54,10 +63,16 @@ function Dashboard({ date, setDate }) {
           Next
         </Link>
       </div>
+      <br />
       <div className="row">
-        <ReservationList reservations={reservations} />
+        <div className="col-6">
+          <ReservationList reservations={reservations} />
+        </div>
+        <div className="col-6">
+          <TablesList tables={tables} />
+        </div>
       </div>
-      <ErrorAlert error={reservationsError} />
+      <ErrorAlert error={reservationsError}  />
     </main>
   );
 }
