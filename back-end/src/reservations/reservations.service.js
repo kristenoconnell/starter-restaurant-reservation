@@ -20,8 +20,16 @@ function create(reservation) {
         .then((createdRes) => createdRes[0]);
 }
 
+function read(reservationId) {
+    return knex("reservations")
+        .select("*")
+        .where({ reservation_id: reservationId });
+    
+}
+
 module.exports = {
     list,
     listByDate,
     create,
+    read
 }

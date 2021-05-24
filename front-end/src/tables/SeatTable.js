@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { table } from "../../../back-end/src/db/connection";
 import { listTables } from "../utils/api";
 import SelectTable from "./SelectTable";
+import { readReservation } from "../utils/api";
 
 function SeatTable() {
   const [tables, setTables] = useState([]);
@@ -18,7 +18,7 @@ function SeatTable() {
          .then(setTables)
          .then(() => readReservation(reservationId))
          .then(setReservation)
-         .catch((tableErrors) => setTableErrors);
+         .catch((errors) => setTableErrors);
        return () => abortController.abort(); 
   }
 

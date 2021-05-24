@@ -1,11 +1,12 @@
 import { useHistory } from "react-router-dom";
+import ErrorAlert from "../layout/ErrorAlert";
 
 function SelectTable({ tables, reservation, handleChange, handleSubmit }) {
   const history = useHistory();
   //let capacity = 0;
 
   const openTables = tables.filter((table) => {
-    table.status === "Free" && table.capacity >= reservation.people;
+    return table.status === "Free" && table.capacity >= reservation.people;
   });
 
   if (!openTables.length) {
@@ -13,7 +14,7 @@ function SelectTable({ tables, reservation, handleChange, handleSubmit }) {
       <div>
         <ErrorAlert
           error={{
-            message: `There are no tables currently available for a party of ${table.capacity}. Please wait for an open table.`,
+            message: `There are no tables currently available for a party of ${reservation.people}. Please wait for an open table.`,
           }}
         />
         <button onClick={() => history.push("/")}>Back to Dashboard</button>

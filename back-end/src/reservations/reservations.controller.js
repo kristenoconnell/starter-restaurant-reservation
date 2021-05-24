@@ -138,6 +138,11 @@ async function create(req, res) {
   res.status(201).json({ data: newRes });
 }
 
+async function listReservation(reservationId) {
+  const data = await service.read(reservationId);
+  res.json({ data });
+}
+
 module.exports = {
   listByDate: asyncErrorBoundary(listByDate),
   create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, asyncErrorBoundary(create)]
