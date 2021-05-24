@@ -24,7 +24,7 @@ function ReservationList({ reservations }) {
                     </div>
                     <div className="row">
                       <div className="col-7">
-                        <p class="text-muted">{reservation.mobile_number}</p>
+                        <p className="text-muted">{reservation.mobile_number}</p>
                       </div>
                     </div>
                     <div className="row">

@@ -9,7 +9,7 @@ const controller = require("./reservations.controller");
 
 //router.route("/date").get(controller.listByDate);
 
-router.route("/:reservation_id").get(controller.read);
+router.route("/:reservationId").get(controller.read);
 
 router.route("/").get(controller.listByDate).post(controller.create);
 

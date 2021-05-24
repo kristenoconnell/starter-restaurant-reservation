@@ -23,7 +23,7 @@ function Dashboard({ date, setDate }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
-  const [tablesError, setTablesError] = useState(null);
+  const [tableErrors, setTableErrors] = useState(null);
 
   function loadDashboard() {
     const res_date = date;
@@ -32,13 +32,13 @@ function Dashboard({ date, setDate }) {
     listByDate(res_date, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
-    setTablesError(null);
+    setTableErrors(null);
     listTables(abortController.signal)
       .then(setTables)
-      .catch(setTablesError);
+      .catch((errors) => setTableErrors);
     
     //console.log("reservations", reservations)
-    console.log("tables", tables)
+    //console.log("tables", tables)
     return () => abortController.abort();
   }
 
@@ -66,10 +66,10 @@ function Dashboard({ date, setDate }) {
       <br />
       <div className="row">
         <div className="col-6">
-          <ReservationList reservations={reservations} />
+          <ReservationList reservations={reservations} tables={tables} tableErrors={tableErrors} />
         </div>
         <div className="col-6">
-          <TablesList tables={tables} />
+          <TablesList tables={tables} reservations={reservations} tableErrors={tableErrors} />
         </div>
       </div>
       <ErrorAlert error={reservationsError}  />

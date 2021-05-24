@@ -122,6 +122,21 @@ function withinBusinessHours(req, res, next) {
   } next();
 }
 
+//Reservation exists
+async function reservationExists(req, res, next) {
+  const { reservationId } = req.params;
+  const reservation = await service.read(reservationId)
+
+  if (reservation) {
+    res.locals.reservation = reservation;
+    return next();
+  }
+  next({
+      status: 404,
+      message: `Reservation with ${reservationId} was not found.`
+    })
+}
+
 /**
  * List handler for reservation resources
  */
@@ -138,12 +153,13 @@ async function create(req, res) {
   res.status(201).json({ data: newRes });
 }
 
-async function listReservation(reservationId) {
-  const data = await service.read(reservationId);
+async function read(req, res) {
+  const data = res.locals.reservation;
   res.json({ data });
 }
 
 module.exports = {
   listByDate: asyncErrorBoundary(listByDate),
-  create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, asyncErrorBoundary(create)]
+  create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, asyncErrorBoundary(create)],
+  read: [reservationExists, asyncErrorBoundary(read)]
 };

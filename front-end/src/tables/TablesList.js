@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ListTables({ tables }) {
+function ListTables({ tables, reservations }) {
 
     return (
         <div className="container">
@@ -14,7 +14,7 @@ function ListTables({ tables }) {
                             Capacity: {table.capacity}
                             <br />
                         </div>
-                        <div className="data-table-id-status=${table.table_id} col-6 text-muted">
+                        <div className={`data-table-id-status=${table.table_id} col-6 text-muted`}>
                             Status: {table.status}         
                         </div>
                     </div>

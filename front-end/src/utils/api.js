@@ -94,11 +94,12 @@ export async function createReservation(reservation, signal) {
   return await fetchJson(url, options);
 };
 
-export async function readReservation(reservationId, signal) {
-  const url = new URL(`${API_BASE_URL}/reservations/${reservationId}`)
-  return await fetchJson(url, { headers, signal })
+export async function readReservation(reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}`;
+  return await fetchJson(url, { signal })
     .then(formatReservationDate)
     .then(formatReservationTime);
+   // .catch((e) => console.log("caught error:", e));
 }
 
 
@@ -113,6 +114,25 @@ export async function createTable(table, signal) {
     body: JSON.stringify({ data: table }),
     signal
   }
-  console.log("table body", options.body);
+  //console.log("table body", options.body);
+  return await fetchJson(url, options)
+}
+
+export async function readTable(table_id, signal) {
+  const url = new URL(`${API_BASE_URL}/tables/${table_id}`);
+  return await fetchJson(url, { signal });
+
+} 
+
+export async function seatTable(table_id, reservation_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: { reservation_id } }),
+    signal
+  }
+  console.log("seatTable options body", options.body);
+  console.log(fetchJson(url, options));
   return await fetchJson(url, options)
 }
