@@ -12,7 +12,7 @@ function NewTable() {
     }
 
     const [formData, setFormData] = useState({ ...initialFormState });
-    const abortController = new AbortController();
+    //const abortController = new AbortController();
     const history = useHistory();
 
     
@@ -20,7 +20,7 @@ function NewTable() {
         const value = target.value;
         setFormData({
             ...formData,
-            [target.name]: target.value
+            [target.name]: value
         });
     };
 

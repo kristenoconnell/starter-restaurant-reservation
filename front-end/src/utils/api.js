@@ -125,6 +125,7 @@ export async function readTable(table_id, signal) {
 } 
 
 export async function seatTable(table_id, reservation_id, signal) {
+  console.log("api call seatTable", table_id);
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
   const options = {
     method: "PUT",
@@ -133,6 +134,5 @@ export async function seatTable(table_id, reservation_id, signal) {
     signal
   }
   console.log("seatTable options body", options.body);
-  console.log(fetchJson(url, options));
   return await fetchJson(url, options)
 }

@@ -2,11 +2,11 @@ const router = require("express").Router();
 const controller = require("./tables.controller");
 
 router
-    .route("/:tableId([0-9]+)/seat")
+    .route("/:tableId/seat")
     .put(controller.update);
 
 router
-    .route("/:tableId([0-9]+)")
+    .route("/:tableId")
     .get(controller.read);
 
 router

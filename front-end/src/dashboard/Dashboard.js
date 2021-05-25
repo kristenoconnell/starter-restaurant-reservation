@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { listByDate, listTables } from "../utils/api";
-import { today, previous, next } from "../utils/date-time";
+import { previous, next } from "../utils/date-time";
 import ReservationList from "../reservations/ReservationList";
 import TablesList from "../tables/TablesList";
 import useQuery from "../utils/useQuery";
