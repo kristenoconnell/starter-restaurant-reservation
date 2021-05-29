@@ -7,7 +7,7 @@ function NewTable() {
 
     const initialFormState = {
         table_name: "",
-        capacity: 1,
+        capacity: "",
         status: "Free",
     }
 
@@ -29,8 +29,6 @@ function NewTable() {
         try {
             await createTable(formData);
             history.push("/dashboard");
-            //await create table function here
-            //push to dashboard page once submitted
         } catch (error) {
             throw error;
         }

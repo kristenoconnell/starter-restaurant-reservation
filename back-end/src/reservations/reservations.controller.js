@@ -1,6 +1,7 @@
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const validator = require("validator");
 const service = require("./reservations.service");
+const P = require("pino");
 
 //-->MIDDLEWARE<--
 
@@ -15,6 +16,7 @@ const VALID_PROPERTIES = [
   "reservation_id",
   "created_at",
   "updated_at",
+  "status"
 ];
   
 //clunky middleware to check for missing or empty properties
@@ -137,13 +139,57 @@ async function reservationExists(req, res, next) {
     })
 }
 
+//Reservation status for Creation
+async function validStatus(req, res, next) {
+  const { status } = req.body.data;
+  if (status) {
+    if (status !== "booked") {
+      return next({
+        status: 400,
+        message: `Cannot seat a reservation with a status of ${status}.`
+      })
+    } else if (status === "booked") {
+      return next();
+    }
+  } next();
+}
+
+//Unknown or finished status
+async function unknownOrFinished(req, res, next) {
+  const { reservationId } = req.params;
+  const reservation = await service.read(reservationId);
+  const { status } = req.body.data;
+ 
+  if (status === "unknown" || reservation.status === "finished") {
+    return next({
+      status: 400,
+      message: `Cannot seat a reservation with a finished or unknown status.`
+    })
+  }
+  next();
+}
+
+async function defaultStatus(req, res, next) {
+  const { reservation } = req.body.data;
+  if (!reservation.status) {
+    reservation.status = "booked"
+    return next();
+  }
+}
+
 /**
  * List handler for reservation resources
  */
-async function listByDate(req, res) {
-  const date = req.query.date;
-  const data = await service.listByDate(date);
-  //console.log("Data", data);
+async function list(req, res) {
+  const { date, mobile_number } = req.query;
+  let data;
+  if (date) {
+    data = await service.listByDate(date);
+  } else if (mobile_number) {
+    data = await service.search(mobile_number)
+  } else {
+    data = await service.list();
+  }
   res.json({ data });
 }
 
@@ -158,8 +204,23 @@ async function read(req, res) {
   res.json({ data });
 }
 
+async function updateStatus(req, res) {
+  const { reservationId } = req.params;
+  const { status } = req.body.data;
+  const data = await service.updateStatus(reservationId, status)
+  res.json({ data });
+}
+
+async function searchByNumber(req, res) {
+  const { mobile_number } = req.body.data;
+  const data = await service.searchByNumber(mobile_number);
+  res.json({ data });
+}
+
 module.exports = {
-  listByDate: asyncErrorBoundary(listByDate),
-  create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, asyncErrorBoundary(create)],
-  read: [reservationExists, asyncErrorBoundary(read)]
+  list: asyncErrorBoundary(list),
+  create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, validStatus, asyncErrorBoundary(create)],
+  read: [reservationExists, asyncErrorBoundary(read)],
+  update: [reservationExists, unknownOrFinished, asyncErrorBoundary(updateStatus)],
+  searchByNumber: asyncErrorBoundary(searchByNumber)
 };

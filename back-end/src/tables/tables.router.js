@@ -3,7 +3,8 @@ const controller = require("./tables.controller");
 
 router
     .route("/:tableId/seat")
-    .put(controller.update);
+    .put(controller.update)
+    .delete(controller.delete);
 
 router
     .route("/:tableId")

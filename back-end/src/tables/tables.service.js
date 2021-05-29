@@ -14,17 +14,27 @@ function create(table) {
 };
 
 function read(tableId) {
-    return knex("tables as t")
+    return knex("tables")
         .select("*")
         .where({ table_id: tableId })
         .first();
 }
 
-function update(tableId, reservationId) {
-    return knex("tables")
-        .where({ table_id: tableId })
-        .update({ reservation_id: reservationId }, ["table_id", "table_name", "capacity", "status", "reservation_id"])
-        .then((updatedTables) => updatedTables[0]);
+async function updateSeatRes(tableId, reservationId) {
+    const trx = await knex.transaction();
+    let updated = {};
+    return trx("reservations")
+        .where({ reservation_id: reservationId })
+        .update({ status: "seated" })
+        .then(() =>
+            trx("tables")
+                .where({ table_id: tableId })
+                .update({ reservation_id: reservationId }, ["table_id", "table_name", "capacity", "status", "reservation_id"])
+                .then((result) => (updated = result[0]))
+        )
+        .then(trx.commit)
+        .then(() => updated)
+        .catch(trx.rollback);           
 }
 
 function readReservation(reservationId) {
@@ -34,11 +44,29 @@ function readReservation(reservationId) {
         .first();
 }
 
+async function deleteTableAssignment(tableId, reservationId) {
+    const trx = await knex.transaction();
+    let updated = {};
+    return trx("reservations")
+        .where({ reservation_id: reservationId })
+        .update({ status: "finished" })
+        .then(() =>
+            trx("tables")
+                .where({ table_id: tableId })
+                .update({ reservation_id: null }, ["table_id", "table_name", "capacity", "status", "reservation_id"])
+                .then((result) => result[0])
+    )
+        .then(trx.commit)
+        .then(() => updated)
+        .catch(trx.rollback);
+}
+
 
 module.exports = {
     list,
     create,
     read,
-    update,
-    readReservation
+    updateSeatRes,
+    readReservation,
+    deleteTableAssignment
 }

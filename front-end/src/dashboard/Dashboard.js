@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { listByDate, listTables } from "../utils/api";
+import {
+  listByDate,
+  listTables,
+  deleteTableAssignment,
+  changeResStatus
+} from "../utils/api";
 import { previous, next } from "../utils/date-time";
 import ReservationList from "../reservations/ReservationList";
 import TablesList from "../tables/TablesList";
@@ -13,12 +18,11 @@ import ErrorAlert from "../layout/ErrorAlert";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date, setDate }) {
+function Dashboard({ date }) {
   const query = useQuery();
   if (query.get("date")) {
     date = query.get("date")
   }
-  //console.log("date", date)
 
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
@@ -37,12 +41,31 @@ function Dashboard({ date, setDate }) {
       .then(setTables)
       .catch((errors) => setTableErrors);
     
-    //console.log("reservations", reservations)
-    //console.log("tables", tables)
     return () => abortController.abort();
   }
 
-   useEffect(loadDashboard, [date]);
+  useEffect(loadDashboard, [date]);
+  
+  const handleFinish = async ({ target }) => {
+    const confirm = window.confirm(
+      "Is this table ready to seat new guests? This cannot be undone."
+    );
+    if (confirm) {
+      try {
+        await deleteTableAssignment(target.value);
+        loadDashboard();
+      } catch (error) {
+        setTableErrors(error);
+      }
+    }
+  };
+
+  const updateStatus = async ({ target }) => {
+    const reservation_id = target.value;
+    console.log("update status id", reservation_id);
+    await changeResStatus(reservation_id, 'seated')
+    loadDashboard();
+  }
 
   return (
     <main>
@@ -66,10 +89,10 @@ function Dashboard({ date, setDate }) {
       <br />
       <div className="row">
         <div className="col-6">
-          <ReservationList reservations={reservations} tables={tables} tableErrors={tableErrors} />
+          <ReservationList reservations={reservations} updateStatus={updateStatus} />
         </div>
         <div className="col-6">
-          <TablesList tables={tables} reservations={reservations} tableErrors={tableErrors} />
+          <TablesList tables={tables} handleFinish={handleFinish} reservations={reservations} tableErrors={tableErrors} />
         </div>
       </div>
       <ErrorAlert error={reservationsError}  />

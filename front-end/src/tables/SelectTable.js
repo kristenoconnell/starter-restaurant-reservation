@@ -1,11 +1,11 @@
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 
-function SelectTable({ tables, reservation, handleChange, handleSubmit, formData, setFormData }) {
+function SelectTable({ tables, reservation, handleChange, handleSubmit }) {
     const history = useHistory();
 
   const openTables = tables.filter((table) => {
-    return table.capacity >= reservation.people;
+    return table.capacity >= reservation.people && table.status === 'Free';
   });
 
     if (!openTables.length) {
@@ -20,8 +20,6 @@ function SelectTable({ tables, reservation, handleChange, handleSubmit, formData
             </div>
         );
     } else if (openTables.length) {
-       
-
     return (
         <div className="container">
             <div className="row">
