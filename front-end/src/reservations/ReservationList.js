@@ -41,8 +41,9 @@ function ReservationList({ reservations, updateStatus, handleCancel }) {
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-7">
-                        {reservation.status === "booked" ? (
+                      {reservation.status === "booked" ? (
+                        <>
+                         <div className="col-7">
                           <Link
                             to={`/reservations/${reservation.reservation_id}/seat`}
                           >
@@ -54,26 +55,31 @@ function ReservationList({ reservations, updateStatus, handleCancel }) {
                               Seat
                             </button>
                           </Link>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                      <div className="col-5">
-                        <Link to={`/reservations/${reservation.reservation_id}/edit`}><button
+                        </div>
+                        <div className="col-5">
+                           <Link to={`/reservations/${reservation.reservation_id}/edit`}><button
                           className="mr-1"
                           href={`/reservations/${reservation.reservation_id}/edit`}
                         >
                           Edit
                         </button>
-                          </Link>
-                        <button
+                            </Link> 
+                        </div>
+                          </>
+                        ) : (
+                          ""
+                        )}
+                    </div>
+                    <div className="row justify-center">
+                       <button
                           data-reservation-id-cancel={
                             reservation.reservation_id
-                          } onClick={handleCancel}>
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
+                          }
+                        onClick={handleCancel}
+                       value={reservation.reservation_id}>
+                              Cancel
+                        </button> 
+                  </div>
                   </div>
                 </div>
               ))}

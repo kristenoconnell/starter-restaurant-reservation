@@ -39,7 +39,7 @@ function Dashboard({ date }) {
     setTableErrors(null);
     listTables(abortController.signal)
       .then(setTables)
-      .catch((errors) => setTableErrors);
+      .catch(setTableErrors);
     
     return () => abortController.abort();
   }
@@ -55,15 +55,30 @@ function Dashboard({ date }) {
         await deleteTableAssignment(target.value);
         loadDashboard();
       } catch (error) {
-        setTableErrors(error);
+        setTableErrors([error]);
       }
     }
   };
 
+   const handleCancel = async (event) => {
+     const confirm = window.confirm(
+       "Do you want to cancel this reservation? This cannot be undone."
+     );
+     if (confirm) {
+         const reservation_id = event.target.value;
+         console.log("handle change", reservation_id);
+          const changed = await changeResStatus(
+           reservation_id,
+           "cancelled"
+         );
+        loadDashboard();
+     }
+   };
+
   const updateStatus = async ({ target }) => {
     const reservation_id = target.value;
     console.log("update status id", reservation_id);
-    await changeResStatus(reservation_id, 'seated')
+    await changeResStatus(reservation_id, "seated")
     loadDashboard();
   }
 
@@ -89,7 +104,7 @@ function Dashboard({ date }) {
       <br />
       <div className="row">
         <div className="col-6">
-          <ReservationList reservations={reservations} updateStatus={updateStatus} />
+          <ReservationList reservations={reservations} updateStatus={updateStatus} handleCancel={handleCancel} />
         </div>
         <div className="col-6">
           <TablesList tables={tables} handleFinish={handleFinish} reservations={reservations} tableErrors={tableErrors} />

@@ -32,18 +32,20 @@ function NewReservation() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        const abortController = new AbortController();
         const foundErrors = ValidateReservation(formData);
         if (foundErrors.length) {
             setErrors(foundErrors);
         } else {
             try {
-                const newRes = await createReservation(formData);
+                const newRes = await createReservation(formData, {signal: abortController.signal });
                 history.push(`/dashboard/?date=${newRes.reservation_date.slice(0, 10)}`);
             } catch (error) {
                 if (error === !"AbortError") {
                     setErrors([error]);
                 }
             }
+            return () => abortController.abort();
         }
     };
 

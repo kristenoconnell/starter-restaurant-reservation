@@ -89,6 +89,7 @@ export async function searchByNumber(mobile_number, signal) {
 
 export async function editReservation(reservation_id, updatedRes, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}/edit`;
+  updatedRes.people = Number(updatedRes.people);
   const options = {
     method: "PUT",
     headers,
@@ -115,7 +116,6 @@ export async function readReservation(reservation_id, signal) {
   return await fetchJson(url, { signal })
     .then(formatReservationDate)
     .then(formatReservationTime);
-   // .catch((e) => console.log("caught error:", e));
 }
 
 
@@ -130,7 +130,6 @@ export async function createTable(table, signal) {
     body: JSON.stringify({ data: table }),
     signal
   }
-  //console.log("table body", options.body);
   return await fetchJson(url, options)
 }
 
@@ -141,7 +140,6 @@ export async function readTable(table_id, signal) {
 } 
 
 export async function seatTable(table_id, reservation_id, signal) {
-  //console.log("api call seatTable", table_id);
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
   const options = {
     method: "PUT",
@@ -162,17 +160,21 @@ export async function deleteTableAssignment(table_id, signal) {
     body: JSON.stringify({ data: { table_id } }),
     signal
   }
-  return await fetchJson(url, options)
+  const deleteTableAPIResponse = await fetchJson(url, options);
+  console.log(deleteTableAPIResponse);
+  return deleteTableAPIResponse;
 }
 
 export async function changeResStatus(reservation_id, status, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
   console.log("status api call", status);
+  console.log("res id API call", reservation_id);
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({ data: status }),
+    body: JSON.stringify({ data: { status } }),
     signal
   }
-  return await fetchJson(url, signal)
+  console.log("api call body", options.body);
+  return await fetchJson(url, options)
 }

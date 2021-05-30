@@ -1,50 +1,86 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { changeResStatus, readReservation } from "../utils/api";
+import { editReservation, readReservation } from "../utils/api";
 import ReservationForm from "./ReservationForm";
+import ValidateReservation from "./ValidateReservation";
+import Errors from "../errors/Errors";
 
 function EditReservation() {
-
-    const { reservationId } = useParams();
-    const [reservation, setReservation] = useState({});
-    const history = useHistory();
-
-    const handleChange = ({ target }) => {
-        setReservation({
-            ...reservation,
-            [target.name]: target.value
-        })
+    const initialFormState = {
+        first_name: "",
+        last_name: "",
+        mobile_number: "",
+        reservation_date: "",
+        reservation_time: "",
+        people: "",
+        status: ""
     };
 
-    const handleCancel = async (event) => {
-        const confirm = window.confirm("Do you want to cancel this reservation? This cannot be undone.")
-        if (confirm) {
-            try {
-                const status = "cancelled"
-                const updated = await changeResStatus(reservation.reservation_id, reservation.status);
-                console.log("updated res handle cancel", reservation);
-            } catch (error) {
-                throw error;
-            }
-        }
-    }
+    const { reservationId } = useParams();
+    const [formData, setFormData] = useState({...initialFormState});
+    const [errors, setErrors] = useState([]);
+    const history = useHistory();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        console.log("submit event", event);
-        history.push("/")
-    }
+    useEffect(() => {
+        loadReservation();
+    }, [reservationId]);
 
     //load reservaton 
-    useEffect(() => {
-        const loadReservation = async () => setReservation(await readReservation(reservationId));
-        loadReservation();
-        console.log("set reservation edit res comp", reservation);
-    }, [reservationId]);
+    function loadReservation() {
+        readReservation(reservationId)
+            .then((data) => setFormData(
+                {
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    mobile_number: data.mobile_number,
+                    reservation_date: data.reservation_date,
+                    reservation_time: data.reservation_time.slice(0, 5),
+                    people: data.people,
+                    status: data.status
+
+            }))
+            .catch((error) => setErrors(error));
+    };
+
+    const handleChange = ({ target }) => {
+      setFormData({
+        ...formData,
+        [target.name]: target.value,
+      });
+    };
+
+      const handleSubmit = async (event) => {
+          event.preventDefault();
+          //if (changed) {
+              const foundErrors = ValidateReservation(formData);
+              if (foundErrors.length) {
+                  setErrors(foundErrors);
+              } else {
+                  try {
+                      const updatedRes = await editReservation(reservationId, formData);
+                      history.push(
+                          `/dashboard/?date=${updatedRes.reservation_date.slice(0, 10)}`
+                      );
+                  } catch (error) {
+                      if (error === !"AbortError") {
+                          setErrors([error]);
+                      }
+                  }
+              }
+          //}
+      };
     
 
     return (
-        <ReservationForm handleChange={handleChange} handleCancel={handleCancel} handleSubmit={handleSubmit} />
+        <main>
+            <div>
+                <h1>Edit Reservation</h1>
+            </div>
+            <div>
+                {errors.length > 0 && <Errors errors={errors} />}
+            </div>
+            <ReservationForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
+        </main>
     )
 
 }

@@ -1,8 +1,9 @@
 import React from 'react';
+import Errors from "../errors/Errors";
 
 function ListTables({ tables, handleFinish }) {
   
-    return (
+  return (
       <div className="container">
         {tables.map((table) => (
           <div className="card" key={table.table_id}>

@@ -2,6 +2,8 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const validator = require("validator");
 const service = require("./reservations.service");
 const P = require("pino");
+const knex = require("../db/connection");
+const { rawListeners } = require("../app");
 
 //-->MIDDLEWARE<--
 
@@ -20,7 +22,7 @@ const VALID_PROPERTIES = [
 ];
   
 //clunky middleware to check for missing or empty properties
-function hasValidProperties(req, res, next) {
+async function hasValidProperties(req, res, next) {
   const { data = {} } = req.body;
   //console.log("data", data);
   const invalid = [];
@@ -52,7 +54,7 @@ function hasValidProperties(req, res, next) {
 }
 
 //validate people field is a number
-function validPeople(req, res, next) {
+async function validPeople(req, res, next) {
   const { data = { people } } = req.body;
   if (typeof(data.people) !== "number") {
     return next({
@@ -63,7 +65,7 @@ function validPeople(req, res, next) {
 }
 
 //validate date & time
-function validDate(req, res, next) {
+async function validDate(req, res, next) {
   const { data = { reservation_date } } = req.body;
   if (!validator.isDate(data.reservation_date)) {
     return next({
@@ -74,7 +76,7 @@ function validDate(req, res, next) {
   next();
 }
 
-function validTime(req, res, next) {
+async function validTime(req, res, next) {
   const { data = { reservation_time } } = req.body;
   const timeReg = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
   const check = timeReg.test(data.reservation_time);
@@ -87,7 +89,7 @@ function validTime(req, res, next) {
 }
 
 //No reservations on Tuesdays
-function notTuesday(req, res, next) {
+async function notTuesday(req, res, next) {
   const { data = { reservation_date } } = req.body;
   const day = new Date(data.reservation_date).getUTCDay();
   if (day === 2) {
@@ -99,7 +101,7 @@ function notTuesday(req, res, next) {
 }
 
 //No reservations in the past
-function isInFuture(req, res, next) {
+async function isInFuture(req, res, next) {
   const { data = { reservation_date, reservation_time } } = req.body;
   const thisDate = Date.now();
   const resDate = new Date(`${data.reservation_date} ${data.reservation_time}`).valueOf();
@@ -113,7 +115,7 @@ function isInFuture(req, res, next) {
 }
 
 //No reservations outside of business hours
-function withinBusinessHours(req, res, next) {
+async function withinBusinessHours(req, res, next) {
   const { data = { reservation_time } } = req.body;
   const time = data.reservation_time;
   if (time < "10:30" || time > "21:30") {
@@ -163,18 +165,10 @@ async function unknownOrFinished(req, res, next) {
   if (status === "unknown" || reservation.status === "finished") {
     return next({
       status: 400,
-      message: `Cannot seat a reservation with a finished or unknown status.`
+      message: `Cannot seat or update a reservation with a finished or unknown status.`
     })
   }
   next();
-}
-
-async function defaultStatus(req, res, next) {
-  const { reservation } = req.body.data;
-  if (!reservation.status) {
-    reservation.status = "booked"
-    return next();
-  }
 }
 
 /**
@@ -204,9 +198,20 @@ async function read(req, res) {
   res.json({ data });
 }
 
+async function update(req, res) {
+  const originalRes = res.locals.reservation;
+  const updatedRes = {
+    ...req.body.data,
+    reservation_id: originalRes.reservation_id
+  }
+  const data = await service.update(updatedRes);
+  res.json({ data });
+}
+
 async function updateStatus(req, res) {
   const { reservationId } = req.params;
   const { status } = req.body.data;
+  console.log("controller updateStatus status", status);
   const data = await service.updateStatus(reservationId, status)
   res.json({ data });
 }
@@ -219,8 +224,38 @@ async function searchByNumber(req, res) {
 
 module.exports = {
   list: asyncErrorBoundary(list),
-  create: [hasValidProperties, validDate, validTime, validPeople, notTuesday, isInFuture, withinBusinessHours, validStatus, asyncErrorBoundary(create)],
-  read: [reservationExists, asyncErrorBoundary(read)],
-  update: [reservationExists, unknownOrFinished, asyncErrorBoundary(updateStatus)],
+  create: [
+    asyncErrorBoundary(hasValidProperties),
+    asyncErrorBoundary(validDate),
+    asyncErrorBoundary(validTime),
+    asyncErrorBoundary(validPeople),
+    asyncErrorBoundary(notTuesday),
+    asyncErrorBoundary(isInFuture),
+    asyncErrorBoundary(withinBusinessHours),
+    asyncErrorBoundary(validStatus),
+    asyncErrorBoundary(create)
+  ],
+  read: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(read)
+  ],
+  update: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(hasValidProperties),
+    asyncErrorBoundary(validDate),
+    asyncErrorBoundary(validTime),
+    asyncErrorBoundary(validPeople),
+    asyncErrorBoundary(notTuesday),
+    asyncErrorBoundary(isInFuture),
+    asyncErrorBoundary(withinBusinessHours),
+    asyncErrorBoundary(validStatus),
+    asyncErrorBoundary(unknownOrFinished),
+    asyncErrorBoundary(update)
+  ],
+  updateStatus: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(unknownOrFinished),
+    asyncErrorBoundary(updateStatus)
+  ],
   searchByNumber: asyncErrorBoundary(searchByNumber)
 };
