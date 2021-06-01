@@ -22,11 +22,30 @@ function EditReservation() {
     const history = useHistory();
 
     useEffect(() => {
+        async function loadReservation() {
+               try {
+                 const data = await readReservation(reservationId);
+                 setFormData({
+                   first_name: data.first_name,
+                   last_name: data.last_name,
+                   mobile_number: data.mobile_number,
+                   reservation_date: data.reservation_date,
+                   reservation_time: data.reservation_time.slice(0, 5),
+                   people: data.people,
+                   status: data.status,
+                 });
+               } catch (error) {
+                 setErrors([error]);
+               }
+        };
         loadReservation();
     }, [reservationId]);
+        /*=> {
+        loadReservation();
+    }, [reservationId]);*/
 
     //load reservaton 
-    async function loadReservation() {
+   /* async function loadReservation() {
         try {
             const data = await readReservation(reservationId)
             //.then((data) => 
@@ -44,7 +63,7 @@ function EditReservation() {
             setErrors([error]);
         }
             
-    };
+    };*/
 
     const handleChange = ({ target }) => {
       setFormData({
