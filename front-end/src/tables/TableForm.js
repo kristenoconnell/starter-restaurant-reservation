@@ -31,8 +31,8 @@ function TableForm({ formData, handleChange, handleSubmit }) {
                     />
             </label>
             <br/>
-            <button onClick={() => history.goBack()}>Cancel</button>
-            <button type="submit">Save Table</button>
+            <button className="btn btn-outline-danger btn-sm mr-1" onClick={() => history.goBack()}>Cancel</button>
+            <button type="submit" className="btn-btn-outline-primary btn-sm">Save Table</button>
         </form>
     )
 }
