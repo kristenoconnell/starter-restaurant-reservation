@@ -1,9 +1,7 @@
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const validator = require("validator");
 const service = require("./reservations.service");
-const P = require("pino");
-const knex = require("../db/connection");
-const { rawListeners } = require("../app");
+
 
 //-->MIDDLEWARE<--
 
