@@ -152,7 +152,6 @@ export async function seatTable(table_id, reservation_id, signal) {
 
 export async function deleteTableAssignment(table_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`
-  console.log("API CALL table id", table_id)
   table_id = Number(table_id);
   const options = {
     method: "DELETE",
@@ -161,20 +160,16 @@ export async function deleteTableAssignment(table_id, signal) {
     signal
   }
   const deleteTableAPIResponse = await fetchJson(url, options);
-  console.log(deleteTableAPIResponse);
   return deleteTableAPIResponse;
 }
 
 export async function changeResStatus(reservation_id, status, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
-  console.log("status api call", status);
-  console.log("res id API call", reservation_id);
   const options = {
     method: "PUT",
     headers,
     body: JSON.stringify({ data: { status } }),
     signal
   }
-  console.log("api call body", options.body);
   return await fetchJson(url, options)
 }

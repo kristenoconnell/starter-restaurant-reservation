@@ -47,7 +47,7 @@ function Search() {
                   placeholder="Enter a customer's phone number"
                 />
                 </label>
-                <button type="submit">Find</button>
+                <button type="submit" className="btn btn-outline-secondary btn-sm">Find</button>
             </form>
                 
                 {errors.length > 0 && <Errors errors={errors} />}

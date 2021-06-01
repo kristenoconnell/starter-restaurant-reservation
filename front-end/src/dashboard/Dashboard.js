@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import {
   listByDate,
   listTables,
@@ -24,6 +24,7 @@ function Dashboard({ date }) {
     date = query.get("date")
   }
 
+  const history = useHistory();
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
@@ -66,21 +67,19 @@ function Dashboard({ date }) {
      );
      if (confirm) {
          const reservation_id = event.target.value;
-         console.log("handle change", reservation_id);
-          const changed = await changeResStatus(
+          await changeResStatus(
            reservation_id,
            "cancelled"
          );
-        loadDashboard();
+        history.push("/");
      }
    };
 
-  const updateStatus = async ({ target }) => {
+  /*const updateStatus = async ({ target }) => {
     const reservation_id = target.value;
-    console.log("update status id", reservation_id);
     await changeResStatus(reservation_id, "seated")
     loadDashboard();
-  }
+  }*/
 
   return (
     <main>
@@ -104,7 +103,7 @@ function Dashboard({ date }) {
       <br />
       <div className="row">
         <div className="col-6">
-          <ReservationList reservations={reservations} updateStatus={updateStatus} handleCancel={handleCancel} />
+          <ReservationList reservations={reservations} handleCancel={handleCancel} />
         </div>
         <div className="col-6">
           <TablesList tables={tables} handleFinish={handleFinish} reservations={reservations} tableErrors={tableErrors} />

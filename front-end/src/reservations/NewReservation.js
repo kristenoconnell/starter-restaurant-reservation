@@ -38,7 +38,7 @@ function NewReservation() {
             setErrors(foundErrors);
         } else {
             try {
-                const newRes = await createReservation(formData, {signal: abortController.signal });
+                const newRes = await createReservation(formData,  abortController.signal );
                 history.push(`/dashboard/?date=${newRes.reservation_date.slice(0, 10)}`);
             } catch (error) {
                 if (error === !"AbortError") {

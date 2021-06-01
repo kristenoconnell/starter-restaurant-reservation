@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { listTables, readReservation, seatTable } from "../utils/api";
+import { listTables, readReservation, seatTable, changeResStatus } from "../utils/api";
 import SelectTable from "./SelectTable";
 import Errors from "../errors/Errors";
 
@@ -50,6 +50,13 @@ function SeatReservation() {
     }
   };
 
+  //status update for res
+  const updateStatus = async ({ target }) => {
+    const reservation_id = target.value;
+    await changeResStatus(reservation_id, "seated");
+    history.push("/")
+  };
+
 
   if (tableErrors) {
     return (
@@ -68,6 +75,7 @@ function SeatReservation() {
               handleSubmit={handleSubmit}
               formData={formData}
               setFormData={setFormData}
+              updateStatus={updateStatus}
             />
           </div>
         </div>

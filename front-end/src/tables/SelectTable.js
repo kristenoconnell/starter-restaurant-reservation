@@ -1,7 +1,7 @@
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 
-function SelectTable({ tables, reservation, handleChange, handleSubmit }) {
+function SelectTable({ tables, reservation, handleChange, handleSubmit, updateStatus }) {
     const history = useHistory();
 
   const openTables = tables.filter((table) => {
@@ -16,7 +16,7 @@ function SelectTable({ tables, reservation, handleChange, handleSubmit }) {
                         message: `There are no tables currently available for a party of ${reservation.people}. Please wait for an open table.`,
                     }}
                 />
-                <button onClick={() => history.push("/")}>Back to Dashboard</button>
+                <button className="btn btn-outline-secondary" onClick={() => history.push("/")}>Back to Dashboard</button>
             </div>
         );
     } else if (openTables.length) {
@@ -55,8 +55,8 @@ function SelectTable({ tables, reservation, handleChange, handleSubmit }) {
             </select>
 
           <div className="row py-2">
-            <button type="submit">Save</button>
-            <button onClick={() => history.goBack()}>Cancel</button>
+            <button type="submit" className="btn btn-outline-primary btn-sm mr-1" onClick={updateStatus}>Save</button>
+            <button className="btn btn-outline-danger btn-sm" onClick={() => history.goBack()}>Cancel</button>
           </div>
                 </form>
             </div>

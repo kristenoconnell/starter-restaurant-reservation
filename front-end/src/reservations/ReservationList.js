@@ -19,67 +19,64 @@ function ReservationList({ reservations, updateStatus, handleCancel }) {
                         </h3>
                       </div>
                       <div className="col-5">
-                        {reservation.reservation_time.slice(0, 5)}
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-7">
-                        <p className="text-muted">
-                          {reservation.mobile_number}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-7 text-muted">
-                        Party size: {reservation.people}
-                      </div>
-                      <div
-                        className="col-5"
-                        data-reservation-id-status={reservation.reservation_id}
-                      >
-                        Status: {reservation.status}
-                      </div>
-                    </div>
-                    <div className="row">
-                      {reservation.status === "booked" ? (
-                        <>
-                         <div className="col-7">
-                          <Link
-                            to={`/reservations/${reservation.reservation_id}/seat`}
-                          >
-                            <button
-                              href={`/reservations/${reservation.reservation_id}/seat`}
-                              value={`${reservation.reservation_id}`}
-                              onClick={updateStatus}
-                            >
-                              Seat
-                            </button>
-                          </Link>
-                        </div>
-                        <div className="col-5">
-                           <Link to={`/reservations/${reservation.reservation_id}/edit`}><button
-                          className="mr-1"
-                          href={`/reservations/${reservation.reservation_id}/edit`}
-                        >
-                          Edit
-                        </button>
-                            </Link> 
-                        </div>
-                          </>
-                        ) : (
-                          ""
-                        )}
-                    </div>
-                    <div className="row justify-center">
-                       <button
+                        <button
                           data-reservation-id-cancel={
                             reservation.reservation_id
                           }
-                        onClick={handleCancel}
-                       value={reservation.reservation_id}>
-                              Cancel
-                        </button> 
-                  </div>
+                          onClick={handleCancel}
+                          value={reservation.reservation_id}
+                          className="btn btn-outline-danger btn-sm mb-1"
+                        >
+                          Cancel
+                        </button>
+                        <br/>
+                          {reservation.status === "booked" ? (
+                            <>
+              
+                                <Link
+                                  to={`/reservations/${reservation.reservation_id}/seat`}
+                                >
+                                  <button
+                                    href={`/reservations/${reservation.reservation_id}/seat`}
+                                    value={`${reservation.reservation_id}`}
+                                    className="btn btn-outline-primary btn-sm mr-1"
+                                  >
+                                    Seat
+                                  </button>
+                                </Link>
+                           
+                                <Link
+                                  to={`/reservations/${reservation.reservation_id}/edit`}
+                                >
+                                  <button
+                                    className="btn btn-outline-dark btn-sm"
+                                    href={`/reservations/${reservation.reservation_id}/edit`}
+                                  >
+                                    Edit
+                                  </button>
+                                </Link>
+                  
+                            </>
+                          ) : (
+                            ""
+                          )}
+                      </div>
+                    </div>
+                    
+
+                    <div className="col-7">
+                      Phone: {reservation.mobile_number}
+                      <br />
+                      Time: {reservation.reservation_time.slice(0, 5)}
+                      <br />
+                      Party size: {reservation.people}
+                      <br />
+                      <p
+                        data-reservation-id-status={reservation.reservation_id}
+                      >
+                        Status: {reservation.status}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}

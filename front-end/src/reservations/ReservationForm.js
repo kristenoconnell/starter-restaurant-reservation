@@ -83,8 +83,10 @@ function ReservationForm({ formData, handleChange, handleSubmit }) {
           />
         </label>
         <br />
-        <button onClick={() => history.goBack()}>Cancel</button>
-        <button type="submit" onClick={(event) => handleSubmit(event)}>Submit</button>
+        <button className="btn btn-outline-danger btn-sm mr-1" onClick={() => history.goBack()}>Cancel</button>
+        <button type="submit" className="btn btn-outline-primary btn-sm" onClick={(event) => handleSubmit(event)}>
+          Submit
+        </button>
       </form>
     );
 }

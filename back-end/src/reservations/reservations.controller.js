@@ -24,7 +24,6 @@ const VALID_PROPERTIES = [
 //clunky middleware to check for missing or empty properties
 async function hasValidProperties(req, res, next) {
   const { data = {} } = req.body;
-  //console.log("data", data);
   const invalid = [];
   if (!data.first_name || data.first_name === "") {
     invalid.push("first_name");
@@ -211,7 +210,6 @@ async function update(req, res) {
 async function updateStatus(req, res) {
   const { reservationId } = req.params;
   const { status } = req.body.data;
-  console.log("controller updateStatus status", status);
   const data = await service.updateStatus(reservationId, status)
   res.json({ data });
 }

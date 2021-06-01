@@ -26,20 +26,24 @@ function EditReservation() {
     }, [reservationId]);
 
     //load reservaton 
-    function loadReservation() {
-        readReservation(reservationId)
-            .then((data) => setFormData(
-                {
-                    first_name: data.first_name,
-                    last_name: data.last_name,
-                    mobile_number: data.mobile_number,
-                    reservation_date: data.reservation_date,
-                    reservation_time: data.reservation_time.slice(0, 5),
-                    people: data.people,
-                    status: data.status
+    async function loadReservation() {
+        try {
+            const data = await readReservation(reservationId)
+            //.then((data) => 
+            setFormData({
+                first_name: data.first_name,
+                last_name: data.last_name,
+                mobile_number: data.mobile_number,
+                reservation_date: data.reservation_date,
+                reservation_time: data.reservation_time.slice(0, 5),
+                people: data.people,
+                status: data.status
 
-            }))
-            .catch((error) => setErrors(error));
+            })
+        } catch (error) {
+            setErrors([error]);
+        }
+            
     };
 
     const handleChange = ({ target }) => {
